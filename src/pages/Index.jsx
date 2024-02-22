@@ -1,4 +1,4 @@
-import { Box, Button, FormControl, FormLabel, Input, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, useDisclosure, Text, VStack, Code } from "@chakra-ui/react";
+import { Box, Button, FormControl, FormLabel, Input, Select, Table, Thead, Tbody, Tr, Th, Td, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, useDisclosure, VStack } from "@chakra-ui/react";
 import { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 
@@ -57,8 +57,11 @@ const Index = () => {
             <Input id="username" placeholder="Enter username" value={username} onChange={(e) => setUsername(e.target.value)} />
           </FormControl>
           <FormControl isRequired>
-            <FormLabel htmlFor="isAgent">Is Agent?</FormLabel>
-            <Input id="isAgent" placeholder="Enter true or false" value={isAgent} onChange={(e) => setIsAgent(e.target.value.toLowerCase() === "true")} />
+            <FormLabel htmlFor="userRole">User Role</FormLabel>
+            <Select id="userRole" placeholder="Select role" value={isAgent ? "Agent" : "Player"} onChange={(e) => setIsAgent(e.target.value === "Agent")}>
+              <option value="Agent">Agent</option>
+              <option value="Player">Player</option>
+            </Select>
           </FormControl>
           <Button leftIcon={<FaSearch />} colorScheme="blue" type="submit">
             Search
@@ -73,9 +76,31 @@ const Index = () => {
           <ModalHeader>API Response</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Code as="pre" width="full" p={5} overflowX="auto">
-              {JSON.stringify(mockResponse, null, 2)}
-            </Code>
+            <Table variant="simple">
+              <Thead>
+                <Tr>
+                  <Th>Property</Th>
+                  <Th>Value</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {Object.entries(mockResponse).map(([key, value]) =>
+                  typeof value === "object" ? (
+                    Object.entries(value).map(([nestedKey, nestedValue]) => (
+                      <Tr key={nestedKey}>
+                        <Td>{`${key} - ${nestedKey}`}</Td>
+                        <Td>{JSON.stringify(nestedValue)}</Td>
+                      </Tr>
+                    ))
+                  ) : (
+                    <Tr key={key}>
+                      <Td>{key}</Td>
+                      <Td>{JSON.stringify(value)}</Td>
+                    </Tr>
+                  ),
+                )}
+              </Tbody>
+            </Table>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>
